@@ -1,15 +1,32 @@
-module.exports = app =>{
+const { connect } = require("mongodb");
+const dbconfig = require("../libs/dbconfig");
+const { MongoClient } = require('mongodb')
 
-    app.get('/usuario',(req,res) =>{
-        res.json([
-            {
-                nome : 'Alexandre',
-                email : 'alexandre.nascimento@live.com'
-            },
-            {
-                nome : 'Thais Nascimento',
-                email : 'tatydourado@gmail.com'
-            }
-        ])
+
+module.exports = app => {
+    app.get('/usuario', async (req, res, next) => {
+
+        try {
+            const db = await connect();
+            res.json(await db.collection('Usuario').find().toArray())
+        }
+        catch (ex) {
+            console.log(ex)
+            res.status(400).json({ erro: `${ex}` });
+        }
     })
+
+    async function connect() {
+        if (global.db) return global.db;
+    
+        const conn = await MongoClient.connect(dbconfig.conectionString, {
+            useUnifiedTopology: false
+        });
+    
+        if (!conn) return new Error('Falha na conexão');
+    
+        global.db = await conn.db(dbconfig.db);
+
+        return global.db;
+    }
 }
