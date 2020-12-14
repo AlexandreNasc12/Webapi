@@ -1,7 +1,4 @@
-const { connect } = require("mongodb");
-const dbconfig = require("../libs/dbconfig");
 const { MongoClient } = require('mongodb')
-
 
 module.exports = app => {
     app.get('/usuario', async (req, res, next) => {
@@ -20,7 +17,7 @@ module.exports = app => {
         if (global.db) return global.db;
     
         const conn = await MongoClient.connect(dbconfig.conectionString, {
-            useUnifiedTopology: false
+            useUnifiedTopology: true
         });
     
         if (!conn) return new Error('Falha na conexão');
